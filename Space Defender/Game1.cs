@@ -40,6 +40,8 @@ namespace Space_Defender
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             SplashScreen.Background = Content.Load<Texture2D>("background");
             SplashScreen.Font = Content.Load<SpriteFont>("SplashFont");
+            Asteroidy.Init(_spriteBatch, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
+            Star.Texture2D = Content.Load<Texture2D>("star");
             // TODO: use this.Content to load your game content here
         }
 
@@ -52,6 +54,7 @@ namespace Space_Defender
                     if (Keyboard.GetState().IsKeyDown(Keys.Space)) Stat = Stat.Game;
                     break;
                 case Stat.Game:
+                    Asteroidy.Update();
                     if (Keyboard.GetState().IsKeyDown(Keys.Escape)) Stat = Stat.SplashScreen;
                     break;
             }
@@ -72,7 +75,7 @@ namespace Space_Defender
                     SplashScreen.Draw(_spriteBatch);
                     break;
                 case Stat.Game:
-
+                    Asteroidy.Draw();
                     break;
             }
             SplashScreen.Draw(_spriteBatch);
