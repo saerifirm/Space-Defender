@@ -3,8 +3,12 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Space_Defender.code;
 
+
 namespace Space_Defender
 {
+    /// <summary>
+    /// определение текущего состояния игры
+    /// </summary>
     enum Stat
     {
         SplashScreen,
@@ -12,12 +16,25 @@ namespace Space_Defender
         Final,
         Pause
     }
+
+    /// <summary>
+    /// основной класс игры
+    /// </summary>
     public class Game1 : Game
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private GraphicsDeviceManager _graphics;
+        /// <summary>
+        /// 
+        /// </summary>
         private SpriteBatch _spriteBatch;
-        Stat Stat = Stat.SplashScreen;
+        Stat Stat = Stat.Game;
 
+        /// <summary>
+        /// конструктор класса Game1
+        /// </summary>
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -25,6 +42,9 @@ namespace Space_Defender
             IsMouseVisible = true;
         }
 
+        /// <summary>
+        /// инициализация игры
+        /// </summary>
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
@@ -35,6 +55,9 @@ namespace Space_Defender
             base.Initialize();
         }
 
+        /// <summary>
+        /// загрузка игровых ресурсов
+        /// </summary>
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -42,29 +65,45 @@ namespace Space_Defender
             SplashScreen.Font = Content.Load<SpriteFont>("SplashFont");
             Asteroidy.Init(_spriteBatch, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
             Star.Texture2D = Content.Load<Texture2D>("star");
+            StarShip.Texture2D = Content.Load<Texture2D>("starship");
             // TODO: use this.Content to load your game content here
         }
 
+        /// <summary>
+        /// обновление игры
+        /// </summary>
+        /// <param name="gameTime">время игры</param>
         protected override void Update(GameTime gameTime)
         {
-            switch(Stat)
+           KeyboardState keyboardState = Keyboard.GetState();
+            switch (Stat)
             {
                 case Stat.SplashScreen:
                     SplashScreen.Update();
-                    if (Keyboard.GetState().IsKeyDown(Keys.Space)) Stat = Stat.Game;
+                    if (keyboardState.IsKeyDown(Keys.Space))
+                        Stat = Stat.Game;
                     break;
                 case Stat.Game:
                     Asteroidy.Update();
-                    if (Keyboard.GetState().IsKeyDown(Keys.Escape)) Stat = Stat.SplashScreen;
+                    if (keyboardState.IsKeyDown(Keys.Escape))
+                        Stat = Stat.SplashScreen;
+                    if (keyboardState.IsKeyDown(Keys.Up)) Asteroidy.StarShip.Up();
+                    if (keyboardState.IsKeyDown(Keys.Left)) Asteroidy.StarShip.Left();
+                    if (keyboardState.IsKeyDown(Keys.Right)) Asteroidy.StarShip.Right();
+                    if (keyboardState.IsKeyDown(Keys.Down)) Asteroidy.StarShip.Down();
                     break;
             }
-            //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape)) Exit();
+            //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || keyboardState.IsKeyDown(Keys.Escape)) Exit();
 
             // TODO: Add your update logic here
-            SplashScreen.Update();
+            //SplashScreen.Update();
             base.Update(gameTime);
         }
 
+        /// <summary>
+        /// отрисовка игры
+        /// </summary>
+        /// <param name="gameTime">время игры</param>
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
@@ -78,7 +117,7 @@ namespace Space_Defender
                     Asteroidy.Draw();
                     break;
             }
-            SplashScreen.Draw(_spriteBatch);
+
             _spriteBatch.End();
             // TODO: Add your drawing code here
 
