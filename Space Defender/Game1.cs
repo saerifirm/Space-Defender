@@ -23,14 +23,15 @@ namespace Space_Defender
     public class Game1 : Game
     {
         /// <summary>
-        /// 
+        /// графика
         /// </summary>
         private GraphicsDeviceManager _graphics;
         /// <summary>
-        /// 
+        /// спрайты
         /// </summary>
         private SpriteBatch _spriteBatch;
         Stat Stat = Stat.Game;
+        KeyboardState keyboardState, oldKeyboardState;
 
         /// <summary>
         /// конструктор класса Game1
@@ -66,8 +67,12 @@ namespace Space_Defender
             Asteroidy.Init(_spriteBatch, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
             Star.Texture2D = Content.Load<Texture2D>("star");
             StarShip.Texture2D = Content.Load<Texture2D>("starship");
+            Fire.Texture2D = Content.Load<Texture2D>("fire");
+            Asteroid.Texture2D = Content.Load<Texture2D>("asteroid");
             // TODO: use this.Content to load your game content here
         }
+
+        
 
         /// <summary>
         /// обновление игры
@@ -75,7 +80,7 @@ namespace Space_Defender
         /// <param name="gameTime">время игры</param>
         protected override void Update(GameTime gameTime)
         {
-           KeyboardState keyboardState = Keyboard.GetState();
+            keyboardState = Keyboard.GetState();
             switch (Stat)
             {
                 case Stat.SplashScreen:
@@ -91,13 +96,16 @@ namespace Space_Defender
                     if (keyboardState.IsKeyDown(Keys.Left)) Asteroidy.StarShip.Left();
                     if (keyboardState.IsKeyDown(Keys.Right)) Asteroidy.StarShip.Right();
                     if (keyboardState.IsKeyDown(Keys.Down)) Asteroidy.StarShip.Down();
+                    if (keyboardState.IsKeyDown(Keys.LeftControl) && oldKeyboardState.IsKeyUp(Keys.LeftControl)) Asteroidy.ShipFire();
                     break;
             }
-            //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || keyboardState.IsKeyDown(Keys.Escape)) Exit();
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || keyboardState.IsKeyDown(Keys.Escape)) Exit();
 
             // TODO: Add your update logic here
             //SplashScreen.Update();
+            oldKeyboardState = keyboardState;
             base.Update(gameTime);
+
         }
 
         /// <summary>
