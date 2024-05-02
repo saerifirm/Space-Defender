@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Mime;
+using System.Reflection.Metadata;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Space_Defender.code;
@@ -18,7 +21,15 @@ namespace Space_Defender.code
         static public StarShip StarShip { get; set; }
         static List<Fire> fires = new List<Fire>();
         static List<Asteroid> asteroids = new List<Asteroid>();
+        static List<Nlo> nlos = new List<Nlo>();
 
+        static public List<string> list_test = new List<string>() {
+                "asteroid",
+                "nlo"
+            };
+
+
+        
         /// <summary>
         /// получение целого случайного числа в заданном диапазоне
         /// </summary>
@@ -55,6 +66,8 @@ namespace Space_Defender.code
             StarShip = new StarShip(new Vector2(0, Height / 2 - 140));
             for (int i = 0; i < 10; i++)
                 asteroids.Add(new Asteroid());
+                nlos.Add(new Nlo());
+
         }
 
         /// <summary>
@@ -69,6 +82,8 @@ namespace Space_Defender.code
             StarShip.Draw();
             foreach (Asteroid asteroid in asteroids)
                 asteroid.Draw();
+            foreach(Nlo nlo in nlos)
+                nlo.Draw();
         }
 
         /// <summary>
@@ -76,7 +91,7 @@ namespace Space_Defender.code
         /// </summary>
         static public void Update()
         {
-            foreach (Star star in stars)
+            foreach (Star star  in stars)
                 star.Update();
             foreach (Asteroid asteroid in asteroids)
                 asteroid.Update();
@@ -84,10 +99,20 @@ namespace Space_Defender.code
             {
                 fires[i].Update();
                 Asteroid asteroidCrash = fires[i].Crash(asteroids);
+                Nlo nlosCrash = fires[i].Crash(nlos);
                 if (asteroidCrash != null)
                 {
                     asteroids.Remove(asteroidCrash);
                     fires.RemoveAt(i);
+                    asteroids.Add(new Asteroid());
+                    i--;
+                    continue;
+                }
+                if (nlosCrash != null)
+                {
+                    nlos.Remove(nlosCrash);
+                    fires.RemoveAt(i);
+                    nlos.Add(new Nlo());
                     i--;
                     continue;
                 }
@@ -198,17 +223,25 @@ namespace Space_Defender.code
         public Asteroid Crash(List<Asteroid> asteroids)
         {
             foreach (Asteroid asteroid in asteroids)
-                if (asteroid.IsIntersect(new Rectangle((int)Pos.X, (int)Pos.Y, Texture2D.Width, Texture2D.Height))) return asteroid;
+                if (asteroid.IsIntersect(new Rectangle((int)Pos.X, (int)Pos.Y, Texture2D.Width + 100, Texture2D.Height + 100))) return asteroid;
+            return null;
+        }
+        public Nlo Crash(List<Nlo> nlos)
+        {
+            foreach (Nlo nlo in nlos)
+                if (nlo.IsIntersect(new Rectangle((int)Pos.X, (int)Pos.Y, Texture2D.Width + 100, Texture2D.Height + 100))) return nlo;
             return null;
         }
         /// <summary>
-        ///  свойство Hidden, которое возвращает логическое значение (true или false) в зависимости от условия, заданного в блоке get.свойство Hidden будет возвращать true, если объект находится за пределами экрана справа (координата X больше ширины экрана), и false, если объект находится в пределах экрана.
+        ///  свойство Hidden, которое возвращает логическое значение (true или false) в зависимости от условия, заданного в блоке get.свойство Hidden 
+        ///  будет возвращать true, если объект находится за пределами экрана справа (координата X больше ширины экрана), и false, 
+        ///  если объект находится в пределах экрана.
         /// </summary>
         public bool Hidden
         {
             get
             {
-                return Pos.X > Asteroidy.Width;
+                return Pos.X >= Asteroidy.Width;
             }
         }
 
@@ -347,6 +380,78 @@ namespace Space_Defender.code
             this.Dir = Dir;
             RandomSet();
         }
+
+        public void Update()
+        {
+            Pos += Dir;
+            rotation += spinSpeed;
+            if (Pos.X < -100)
+            {
+                RandomSet();
+            }
+        }
+
+        public void RandomSet()
+        {
+            Pos = new Vector2(Asteroidy.GetIntRnd(Asteroidy.Width, Asteroidy.Width + 300), Asteroidy.GetIntRnd(0, Asteroidy.Height));
+            Dir = new Vector2(-(float)Asteroidy.rnd.NextDouble() * 2 + 0.1f, 0f);
+            spinSpeed = (float)(Asteroidy.rnd.NextDouble() - 0.5) / 4;
+            scale = (float)Asteroidy.rnd.NextDouble();
+            center = new Vector2(Texture2D.Width / 2, Texture2D.Height / 2);
+            size = new Point((int)(Texture2D.Width * scale), (int)(Texture2D.Height * scale));
+            //Size = new Point(Asteroids.GetIntRnd(10, 20), Asteroids.GetIntRnd(20,40));
+            //color = Color.FromNonPremultiplied(Asteroids.GetIntRnd(0, 256), Asteroids.GetIntRnd(0, 256), Asteroids.GetIntRnd(0, 256), Asteroids.GetIntRnd(0, 256));
+        }
+
+        public void Draw()
+        {
+            Asteroidy.SpriteBatch.Draw(Texture2D, Pos, null, color, rotation, center, scale, SpriteEffects.None, 0);
+        }
+    }
+
+
+    class Nlo
+    {
+        Vector2 Pos;
+
+        Vector2 Dir;
+        Vector2 center;
+        float scale;
+        Point size;
+
+        Color color = Color.White;
+
+        float spinSpeed = 1;
+        float rotation;
+
+        public static Texture2D Texture2D { get; set; }
+
+        public bool IsIntersect(Rectangle rectangle)
+        {
+            return rectangle.Intersects(new Rectangle((int)Pos.X, (int)Pos.Y, size.X, size.Y));
+        }
+
+        public Nlo()
+        {
+             RandomSet();
+        }
+
+        public Nlo(Vector2 Pos, Vector2 Dir, float Scale, float SpinSpeed)
+        {
+        this.Pos = Pos;
+        this.Dir = Dir;
+        this.scale = Scale;
+        this.spinSpeed = SpinSpeed;
+        center = new Vector2(Texture2D.Width / 2, Texture2D.Height / 2);
+        rotation = 0;
+        size = new Point((int)(Texture2D.Width * scale), (int)(Texture2D.Height * scale));
+        }
+
+         public Nlo(Vector2 Dir)
+         {
+            this.Dir = Dir;
+            RandomSet();
+         }
 
         public void Update()
         {

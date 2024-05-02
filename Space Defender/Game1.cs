@@ -2,7 +2,10 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Space_Defender.code;
-
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Space_Defender
 {
@@ -22,6 +25,7 @@ namespace Space_Defender
     /// </summary>
     public class Game1 : Game
     {
+
         /// <summary>
         /// графика
         /// </summary>
@@ -56,11 +60,15 @@ namespace Space_Defender
             base.Initialize();
         }
 
+
+
         /// <summary>
         /// загрузка игровых ресурсов
         /// </summary>
-        protected override void LoadContent()
+        protected override async void LoadContent()
         {
+
+            
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             SplashScreen.Background = Content.Load<Texture2D>("background");
             SplashScreen.Font = Content.Load<SpriteFont>("SplashFont");
@@ -68,9 +76,13 @@ namespace Space_Defender
             Star.Texture2D = Content.Load<Texture2D>("star");
             StarShip.Texture2D = Content.Load<Texture2D>("starship");
             Fire.Texture2D = Content.Load<Texture2D>("fire");
-            Asteroid.Texture2D = Content.Load<Texture2D>("asteroid");
+            Nlo.Texture2D = Content.Load<Texture2D>("nlo");
+
            
+            Asteroid.Texture2D = Content.Load<Texture2D>(Asteroidy.list_test[Asteroidy.GetIntRnd(0, 2)]);
             Asteroidy.Init(_spriteBatch, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
+                
+            
             // TODO: use this.Content to load your game content here
         }
 
