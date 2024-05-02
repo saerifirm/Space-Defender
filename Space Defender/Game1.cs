@@ -64,11 +64,13 @@ namespace Space_Defender
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             SplashScreen.Background = Content.Load<Texture2D>("background");
             SplashScreen.Font = Content.Load<SpriteFont>("SplashFont");
-            Asteroidy.Init(_spriteBatch, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
+          
             Star.Texture2D = Content.Load<Texture2D>("star");
             StarShip.Texture2D = Content.Load<Texture2D>("starship");
             Fire.Texture2D = Content.Load<Texture2D>("fire");
             Asteroid.Texture2D = Content.Load<Texture2D>("asteroid");
+           
+            Asteroidy.Init(_spriteBatch, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
             // TODO: use this.Content to load your game content here
         }
 
