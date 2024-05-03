@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using Space_Defender.code;
 using System;
 using System.Collections.Generic;
@@ -37,6 +38,7 @@ namespace Space_Defender
         Stat Stat = Stat.Game;
         KeyboardState keyboardState, oldKeyboardState;
 
+        private Song song;
         /// <summary>
         /// конструктор класса Game1
         /// </summary>
@@ -67,18 +69,19 @@ namespace Space_Defender
         /// </summary>
         protected override async void LoadContent()
         {
-
-            
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            song = Content.Load<Song>("song");
+            MediaPlayer.Play(song);
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.MediaStateChanged += MediaPlayer_MediaStateChanged;
+
             SplashScreen.Background = Content.Load<Texture2D>("background");
             SplashScreen.Font = Content.Load<SpriteFont>("SplashFont");
-          
             Star.Texture2D = Content.Load<Texture2D>("star");
             StarShip.Texture2D = Content.Load<Texture2D>("starship");
             Fire.Texture2D = Content.Load<Texture2D>("fire");
             Nlo.Texture2D = Content.Load<Texture2D>("nlo");
-
-           
             Asteroid.Texture2D = Content.Load<Texture2D>(Asteroidy.list_test[Asteroidy.GetIntRnd(0, 2)]);
             Asteroidy.Init(_spriteBatch, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
                 
@@ -86,7 +89,15 @@ namespace Space_Defender
             // TODO: use this.Content to load your game content here
         }
 
-        
+        void MediaPlayer_MediaStateChanged(object sender, System.EventArgs e)
+        {
+            MediaPlayer.Volume -= 0.1f;
+        }
+
+        protected override void UnloadContent()
+        { 
+
+        }
 
         /// <summary>
         /// обновление игры
@@ -97,11 +108,6 @@ namespace Space_Defender
             keyboardState = Keyboard.GetState();
             switch (Stat)
             {
-                case Stat.SplashScreen:
-                    SplashScreen.Update();
-                    if (keyboardState.IsKeyDown(Keys.Space))
-                        Stat = Stat.Game;
-                    break;
                 case Stat.Game:
                     Asteroidy.Update();
                     if (keyboardState.IsKeyDown(Keys.Escape))
@@ -112,8 +118,14 @@ namespace Space_Defender
                     if (keyboardState.IsKeyDown(Keys.Down)) Asteroidy.StarShip.Down();
                     if (keyboardState.IsKeyDown(Keys.LeftControl) && oldKeyboardState.IsKeyUp(Keys.LeftControl)) Asteroidy.ShipFire();
                     break;
+                case Stat.SplashScreen:
+                    SplashScreen.Update();
+                    if (keyboardState.IsKeyDown(Keys.Space))
+                        Stat = Stat.Game;
+                    break;
+                
             }
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || keyboardState.IsKeyDown(Keys.Escape)) Exit();
+            //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || keyboardState.IsKeyDown(Keys.Escape)) Exit();
 
             // TODO: Add your update logic here
             //SplashScreen.Update();

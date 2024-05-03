@@ -467,7 +467,7 @@ namespace Space_Defender.code
         {
             Pos = new Vector2(Asteroidy.GetIntRnd(Asteroidy.Width, Asteroidy.Width + 300), Asteroidy.GetIntRnd(0, Asteroidy.Height));
             Dir = new Vector2(-(float)Asteroidy.rnd.NextDouble() * 2 + 0.1f, 0f);
-            spinSpeed = (float)(Asteroidy.rnd.NextDouble() - 0.5) / 4;
+            spinSpeed = 0;
             scale = (float)Asteroidy.rnd.NextDouble();
             center = new Vector2(Texture2D.Width / 2, Texture2D.Height / 2);
             size = new Point((int)(Texture2D.Width * scale), (int)(Texture2D.Height * scale));
